@@ -9,9 +9,10 @@ use dmc::treasury::{Self};
 
 
 const COIN_DECIMALS: u8 = 9;
-const SYMBOL: vector<u8> = b"";
-const NAME: vector<u8> = b"";
-const DESCRIPTION: vector<u8> = b"";
+const SYMBOL: vector<u8> = b"DMC";
+const NAME: vector<u8> = b"Delorean";
+const DESCRIPTION: vector<u8> = b"This is the official token that powers the DeLorean Web3 ecosystem";
+// TBD, will be updated before publishing
 const ICON_URL: vector<u8> = b"";
 
 const TOTAL_SUPPLY: u64 = 12_800_000_000_000_000_000;
