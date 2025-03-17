@@ -3,10 +3,19 @@
 # A script to publish the smart contract under ../move/<dir name>
 # On successful deployment, the script updates the env files setup/.env and app/.env
 # The env files are updated with env variables to represent the newly created objects
+#
+# Additionally, the script:
+# - Makes a transaction to destroy the upgrade cap
+# - Makes a transaction to send the full balance to the multisig-msafe address
 
 # dir of smart contract
 MOVE_PACKAGE_PATH="../move/dmc"
+
 PUBLISH_GAS_BUDGET=900000000
+TRANSFER_GAS_BUDGET=100000000
+
+# Replace this with msafe wallet address
+RECIPIENT_ADDRESS=0x3d78abc33ccd173c521b4f9e78b21ea2c989960b631732c539efaa38bda30976
 
 # check this is being run from the right location
 if [[ "$PWD" != *"/scripts" ]]; then
@@ -59,7 +68,7 @@ fi
 
 # Do actual puslish
 echo "Publishing"
-PUBLISH_RES=$(sui client publish --skip-dependency-verification ${WITH_UNPUBLISHED_DEPENDENCIES} --json ${MOVE_PACKAGE_PATH})
+PUBLISH_RES=$(sui client publish --verify-deps ${WITH_UNPUBLISHED_DEPENDENCIES} --json ${MOVE_PACKAGE_PATH})
 
 echo "Writing publish result to .publish.res.json"
 echo ${PUBLISH_RES} >.publish.res.json
@@ -77,8 +86,42 @@ echo "Creating new env variables"
 PUBLISH_OBJECTS=$(echo "$PUBLISH_RES" | jq -r '.objectChanges[] | select(.type == "published")')
 PACKAGE_ID=$(echo "$PUBLISH_OBJECTS" | jq -r '.packageId')
 CREATED_OBJS=$(echo "$PUBLISH_RES" | jq -r '.objectChanges[] | select(.type == "created")')
-UPGRADECAP=$(echo "$CREATED_OBJS" | jq -r 'select (.objectType == "0x2::package::UpgradeCap").objectId')
+UPGRADE_CAP=$(echo "$CREATED_OBJS" | jq -r 'select (.objectType == "0x2::package::UpgradeCap").objectId')
+TOTAL_BALANCE_COIN=$(echo "$CREATED_OBJS" | jq -r 'select(.objectType == "0x2::coin::Coin<'$PACKAGE_ID'::dmc::DMC>").objectId')
 ADMIN=$(sui client active-address)
+
+# Destroy the UpgradeCap
+echo "Destroying the UpgradeCap"
+DESTROY_UPGRADE_CAP_RES=$(sui client call \
+	--package 0x2 \
+	--module 'package' \
+	--function 'make_immutable' \
+	--args $UPGRADE_CAP)
+
+# Check if the command succeeded (exit status 0) and for success in text
+if [[ "$DESTROY_UPGRADE_CAP_RES" =~ "error" && "$DESTROY_UPGRADE_CAP_RES" != *"Success"* ]]; then
+	# If yes, print the error message and exit the script
+	echo "Error during the destruction of UpgradeCap. Details"
+	exit 1
+fi
+
+echo "Destroy UpgradeCap successful"
+
+# Sent the total balance coin to the msafe wallet
+echo "Sending the total balance coin to the msafe wallet"
+SEND_TOTAL_BALANCE_COIN_RES=$(sui client transfer \
+	--to $RECIPIENT_ADDRESS \
+	--object-id $TOTAL_BALANCE_COIN \
+	--gas-budget $TRANSFER_GAS_BUDGET)
+
+#Check if the command succeeded (exit status 0) and for success in text
+if [[ "$SEND_TOTAL_BALANCE_COIN_RES" =~ "error" && "$SEND_TOTAL_BALANCE_COIN_RES" != *"Success"* ]]; then
+	# If yes, print the error message and exit the script
+	echo "Error during the transfer of total balance coin. Details"
+	exit 1
+fi
+
+echo "Transfer total balance coin successful"
 
 EXPORT_RESP=$(sui keytool export --key-identity $ADMIN --json)
 ADMIN_PRIVATE_KEY=$(echo "$EXPORT_RESP" | jq -r '.exportedPrivateKey')
@@ -91,7 +134,7 @@ echo "ADMIN_ADDRESS=$ADMIN"
 cat >.env <<-API_ENV
 	FULLNODE_URL=$FULLNODE_URL
 	PACKAGE_ID=$PACKAGE_ID
-	UPGRADECAP=$UPGRADECAP
+	UPGRADE_CAP=$UPGRADE_CAP
 	ADMIN_PRIVATE_KEY=$ADMIN_PRIVATE_KEY
 API_ENV
 
