@@ -3,8 +3,8 @@
 title: Vesting Contract User Flow
 ---
 graph TD
-    A[Supply Multisig Wallet(mSafe)] --> B[Transfer Funds to Multisig Wallet(MPC vault)]
-    B --> C[Multisig Wallet(MPC vault)]
+    A[Supply Multisig Wallet mSafe] --> B[Transfer Funds to Multisig Wallet MPC vault]
+    B --> C[Multisig Wallet MPC vault]
     
     C --> |Transfer Funds| D[Streamflow Platform]
     subgraph "Streamflow Platform"
