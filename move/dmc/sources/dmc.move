@@ -13,7 +13,7 @@ const SYMBOL: vector<u8> = b"DMC";
 const NAME: vector<u8> = b"DeLorean";
 const DESCRIPTION: vector<u8> = b"This is the official token that powers the DeLorean Web3 ecosystem";
 // TBD, will be updated before publishing
-const ICON_URL: vector<u8> = b"";
+const ICON_URL: vector<u8> = b"https://storage.googleapis.com/tokenimage.deloreanlabs.com/DMCTokenIcon.svg";
 
 const TOTAL_SUPPLY: u64 = 12_800_000_000_000_000_000;
 
