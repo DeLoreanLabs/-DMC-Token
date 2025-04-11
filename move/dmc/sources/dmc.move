@@ -11,7 +11,7 @@ use dmc::treasury::{Self};
 const COIN_DECIMALS: u8 = 9;
 const SYMBOL: vector<u8> = b"DMC";
 const NAME: vector<u8> = b"DeLorean";
-const DESCRIPTION: vector<u8> = b"DeLorean’s FLUX Protocol is an industry first on-chain vehicle reservation and analytics system designed to solve real-world issues facing the automotive sector. At the heart of the DeLorean ecosystem lies $DMC, a token that combines cultural significance, utility, and the backing of an iconic Web2 brand.";
+const DESCRIPTION: vector<u8> = b"DeLorean’s protocol is an industry first on-chain vehicle reservation and analytics system designed to solve real-world issues facing the automotive sector. At the heart of the DeLorean ecosystem lies $DMC, a token that combines cultural significance, utility, and the backing of an iconic Web2 brand.";
 // TBD, will be updated before publishing
 const ICON_URL: vector<u8> = b"https://storage.googleapis.com/tokenimage.deloreanlabs.com/DMCTokenIcon.svg";
 
