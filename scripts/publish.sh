@@ -15,7 +15,7 @@ PUBLISH_GAS_BUDGET=900000000
 TRANSFER_GAS_BUDGET=100000000
 
 # Replace this with msafe wallet address
-RECIPIENT_ADDRESS=0x3d78abc33ccd173c521b4f9e78b21ea2c989960b631732c539efaa38bda30976
+RECIPIENT_ADDRESS=0x8784e730078c87be9fbf9975392f4bc08e39a09a39207b50ba2fca58b5fcd2b1
 
 # check this is being run from the right location
 if [[ "$PWD" != *"/scripts" ]]; then
