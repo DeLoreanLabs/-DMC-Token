@@ -97,7 +97,7 @@ app.listen(PORT, () => {
   console.log(`\n🚀 API running at ${base}\n`);
   console.log(`Available endpoints:
   • ${base}/circulation         → Full circulation info
-  • ${base}/circulating-suply   → Circulating DMC amount only
+  • ${base}/circulating-supply   → Circulating DMC amount only
   • ${base}/total-supply        → Total supply of DMC on-chain`);
 });
 
