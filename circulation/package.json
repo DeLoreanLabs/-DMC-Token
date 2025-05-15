@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node src/index.js",
-    "postinstall": "find ./node_modules/@streamflow/stream/dist/esm/solana/descriptor/idl -name '*.js' -exec sed -i \"s|from './streamflow_aligned_unlocks.json'|from './streamflow_aligned_unlocks.json' assert { type: 'json' }|\" {} \\;"
+    "postinstall": "patch-package"
   },
   "keywords": [],
   "author": "",
@@ -16,5 +16,9 @@
     "@solana/web3.js": "^1.98.2",
     "@streamflow/stream": "^7.5.3-alpha.cffa362.20250508190445",
     "bn.js": "^5.2.2"
+  },
+  "devDependencies": {
+    "patch-package": "^7.0.0",
+    "postinstall-postinstall": "^2.1.0"
   }
 }
