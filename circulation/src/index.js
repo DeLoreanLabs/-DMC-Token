@@ -1,16 +1,18 @@
 import fetch from 'node-fetch';
-import { StreamflowSui, getNumberFromBN } from '@streamflow/stream';
+import { StreamflowSui } from '@streamflow/stream';
 import BN from 'bn.js';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
-    
+
+// ✅ Load treasury address from environment variable
+const treasuryAddress = process.env.TREASURY_ADDRESS;
+const coinType = "0x4c981f3ff786cdb9e514da897ab8a953647dae2ace9679e8358eec1e3e8871ac::dmc::DMC";
+
 const streamflowClient = new StreamflowSui.SuiStreamClient(
   "https://fullnode.mainnet.sui.io"
 );
 
 const client = new SuiClient({ url: getFullnodeUrl("mainnet") });
 
-// input parameters: treasury address: string, coin type: string
-// returns: circulation: BN
 async function getCirculation(treasuryAddress, coinType) {
   const response = await fetch(
     `https://api.streamflow.finance/v1/api/chain/6/contracts?address=${treasuryAddress}`,
@@ -26,7 +28,6 @@ async function getCirculation(treasuryAddress, coinType) {
   }
 
   const contracts = await response.json();
-
   const suiContracts = contracts.data.filter(contract => contract.token === coinType);
 
   let totalWithdrawn = new BN(0);
@@ -37,7 +38,7 @@ async function getCirculation(treasuryAddress, coinType) {
       totalWithdrawn = totalWithdrawn.add(stream.withdrawnAmount);
       totalDeposited = totalDeposited.add(stream.depositedAmount);
     } catch (error) {
-        console.error(`Error fetching stream ${contract.address}:`, error);
+      console.error(`Error fetching stream ${contract.address}:`, error);
     }
   }
 
@@ -46,27 +47,23 @@ async function getCirculation(treasuryAddress, coinType) {
     coinType: coinType,
   });
 
-  if (coinList.data.length == 0) {
-      throw new Error("No coins found");
+  if (coinList.data.length === 0) {
+    throw new Error("No coins found");
   }
 
   let totalBalance = new BN(0);
   coinList.data.forEach(coin => {
-      totalBalance = totalBalance.add(new BN(coin.balance));
+    totalBalance = totalBalance.add(new BN(coin.balance));
   });
 
   console.log("Total balance:", totalBalance.toString());
-
   console.log("Total withdrawn:", totalWithdrawn.toString());
   console.log("Total deposited:", totalDeposited.toString());
 
-  let totalSupply = new BN(12800000000).mul(new BN(10).pow(new BN(9)));
-
+  const totalSupply = new BN(12800000000).mul(new BN(10).pow(new BN(9)));
   const circulation = totalSupply.sub(totalBalance).sub(totalDeposited).add(totalWithdrawn);
-
   return circulation;
 }
 
-// treasury address (the one that creates the vesting contracts), dmc coin type
-const circulation = await getCirculation("", "0x4c981f3ff786cdb9e514da897ab8a953647dae2ace9679e8358eec1e3e8871ac::dmc::DMC");
+const circulation = await getCirculation(treasuryAddress, coinType);
 console.log(circulation.toString());
