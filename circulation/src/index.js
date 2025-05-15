@@ -1,11 +1,8 @@
-import { StreamflowSui, getNumberFromBN } from '@streamflow/stream';
-import BN from 'bn.js';
-import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 import { StreamflowSui } from '@streamflow/stream';
 import BN from 'bn.js';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
 
-// ✅ Load treasury address from environment variable
+// ✅ Load treasury address from environment variable (defined in Render settings)
 const treasuryAddress = process.env.TREASURY_ADDRESS;
 const coinType = "0x4c981f3ff786cdb9e514da897ab8a953647dae2ace9679e8358eec1e3e8871ac::dmc::DMC";
 
@@ -67,5 +64,13 @@ async function getCirculation(treasuryAddress, coinType) {
   return circulation;
 }
 
-const circulation = await getCirculation(treasuryAddress, coinType);
-console.log(circulation.toString());
+// ✅ Top-level await support in a wrapper function
+(async () => {
+  try {
+    const circulation = await getCirculation(treasuryAddress, coinType);
+    console.log(circulation.toString());
+  } catch (err) {
+    console.error("Failed to calculate circulation:", err.message);
+    process.exit(1);
+  }
+})();
