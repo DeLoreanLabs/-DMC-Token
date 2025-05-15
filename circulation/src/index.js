@@ -93,12 +93,12 @@ app.get('/total-supply', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  const base = `http://localhost:${PORT}`;
-  console.log(`API running at ${base}/`);
-
+  const base = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
+  console.log(`\n🚀 API running at ${base}\n`);
   console.log(`Available endpoints:
-  • ${base}/circulation         → Full circulation details (balance, withdrawn, deposited, circulating)
-  • ${base}/circulating-suply   → Just the circulating DMC amount
-  • ${base}/total-supply        → Current total supply from Sui on-chain`);
+  • ${base}/circulation         → Full circulation info
+  • ${base}/circulating-suply   → Circulating DMC amount only
+  • ${base}/total-supply        → Total supply of DMC on-chain`);
 });
+
 
