@@ -1,10 +1,6 @@
-import fetch from 'node-fetch';
-global.fetch = fetch;
-
 import { StreamflowSui, getNumberFromBN } from '@streamflow/stream';
 import BN from 'bn.js';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
-import fetch from 'node-fetch';
 import { StreamflowSui } from '@streamflow/stream';
 import BN from 'bn.js';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
