@@ -1,3 +1,4 @@
+import fetch from 'node-fetch';
 import { StreamflowSui, getNumberFromBN } from '@streamflow/stream';
 import BN from 'bn.js';
 import { SuiClient, getFullnodeUrl } from '@mysten/sui/client';
