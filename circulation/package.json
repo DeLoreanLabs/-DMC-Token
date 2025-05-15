@@ -4,8 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "start": "node src/index.js"
-  },
+  "start": "node src/index.js",
+  "postinstall": "sed -i \"s|from './streamflow_aligned_unlocks.json'|from './streamflow_aligned_unlocks.json' assert { type: 'json' }|\" ./node_modules/@streamflow/stream/dist/esm/solana/descriptor/*.js"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
