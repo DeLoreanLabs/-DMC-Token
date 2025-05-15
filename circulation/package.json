@@ -11,6 +11,9 @@
   "author": "",
   "license": "ISC",
   "description": "",
+  "engines": {
+    "node": "16.x"
+  },
   "dependencies": {
     "@mysten/sui": "^1.29.1",
     "@solana/web3.js": "^1.98.2",
