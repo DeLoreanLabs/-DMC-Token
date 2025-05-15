@@ -4,10 +4,9 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
- "scripts": {
-  "start": "node src/index.js",
-  "postinstall": "find ./node_modules/@streamflow/stream/dist/esm/solana/descriptor/idl -name '*.js' -exec sed -i \"s|from './streamflow_aligned_unlocks.json'|from './streamflow_aligned_unlocks.json' assert { type: 'json' }|\" {} \\;"
-},
+    "start": "node src/index.js",
+    "postinstall": "find ./node_modules/@streamflow/stream/dist/esm/solana/descriptor/idl -name '*.js' -exec sed -i \"s|from './streamflow_aligned_unlocks.json'|from './streamflow_aligned_unlocks.json' assert { type: 'json' }|\" {} \\;"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",
