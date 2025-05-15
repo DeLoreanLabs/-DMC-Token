@@ -58,30 +58,49 @@ async function getCirculation(treasuryAddress, coinType) {
 }
 
 async function getTotalSupplyFromObject() {
-  const resp = await fetch(`https://fullnode.mainnet.sui.io/v1/object/${totalSupplyObjectId}`);
-  const json = await resp.json();
-  const value = json?.data?.content?.fields?.total_supply?.fields?.value;
-  if (!value) throw new Error("Could not parse total supply value");
+  const url = `https://fullnode.mainnet.sui.io/v1/object/${totalSupplyObjectId}`;
+  
+  const resp = await fetch(url, {
+    method: "POST", // <-- ✅ Must be POST for this endpoint
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ /* required structure depends on endpoint, may need adjustment */ })
+  });
+
+  const text = await resp.text();
+
+  if (!text) {
+    throw new Error("Empty response from Sui RPC");
+  }
+
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch (err) {
+    throw new Error("Failed to parse JSON: " + text);
+  }
+
+  const value = json?.data?.content?.fields?.value;
+  if (!value) {
+    throw new Error("Value field missing in response: " + JSON.stringify(json));
+  }
+
   return new BN(value).div(DMC_DECIMALS).toString();
 }
 
-app.get('/circulation', async (req, res) => {
-  try {
-    const data = await getCirculation(treasuryAddress, coinType);
-    res.json({ timestamp: new Date().toISOString(), ...data });
-  } catch (e) {
-    res.status(500).json({ error: e.message });
-  }
-});
 
 app.get('/circulating-supply', async (req, res) => {
   try {
     const data = await getCirculation(treasuryAddress, coinType);
+    if (!data || !data.circulating) throw new Error("Circulating data missing");
     res.send(data.circulating);
   } catch (e) {
+    console.error("Circulating supply error:", e.message);
     res.status(500).send("Error fetching circulating supply");
   }
 });
+
 
 app.get('/total-supply', async (req, res) => {
   try {
@@ -92,13 +111,12 @@ app.get('/total-supply', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, '0.0.0.0', () => {
   const base = process.env.RENDER_EXTERNAL_URL || `http://localhost:${PORT}`;
   console.log(`\n🚀 API running at ${base}\n`);
   console.log(`Available endpoints:
   • ${base}/circulation         → Full circulation info
-  • ${base}/circulating-supply   → Circulating DMC amount only
+  • ${base}/circulating-supply  → Circulating DMC amount only
   • ${base}/total-supply        → Total supply of DMC on-chain`);
 });
-
 
