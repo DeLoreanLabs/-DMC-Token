@@ -74,7 +74,7 @@ app.get('/circulation', async (req, res) => {
   }
 });
 
-app.get('/circulating-suply', async (req, res) => {
+app.get('/circulating-supply', async (req, res) => {
   try {
     const data = await getCirculation(treasuryAddress, coinType);
     res.send(data.circulating);
