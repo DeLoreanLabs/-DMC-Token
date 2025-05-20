@@ -1,6 +1,6 @@
-import { StreamflowSui, getNumberFromBN } from "@streamflow/stream";
+import { getFullnodeUrl, SuiClient } from "@mysten/sui/client";
+import { StreamflowSui } from "@streamflow/stream";
 import BN from "bn.js";
-import { SuiClient, getFullnodeUrl } from "@mysten/sui/client";
 
 const streamflowClient = new StreamflowSui.SuiStreamClient(
   "https://fullnode.mainnet.sui.io"
@@ -10,7 +10,10 @@ const client = new SuiClient({ url: getFullnodeUrl("mainnet") });
 
 // input parameters: treasury address: string, coin type: string
 // returns: circulation: BN
-async function getCirculation(treasuryAddress, coinType) {
+export async function getCirculation(
+  treasuryAddress: string,
+  coinType: string
+) {
   const response = await fetch(
     `https://api.streamflow.finance/v1/api/chain/6/contracts?address=${treasuryAddress}`,
     {
@@ -27,7 +30,7 @@ async function getCirculation(treasuryAddress, coinType) {
   const contracts = await response.json();
 
   const suiContracts = contracts.data.filter(
-    (contract) => contract.token === coinType
+    (contract: any) => contract.token === coinType
   );
 
   let totalWithdrawn = new BN(0);
@@ -57,7 +60,6 @@ async function getCirculation(treasuryAddress, coinType) {
   });
 
   console.log("Total balance:", totalBalance.toString());
-
   console.log("Total withdrawn:", totalWithdrawn.toString());
   console.log("Total deposited:", totalDeposited.toString());
 
@@ -68,12 +70,10 @@ async function getCirculation(treasuryAddress, coinType) {
     .sub(totalDeposited)
     .add(totalWithdrawn);
 
-  return circulation;
+  return {
+    totalBalance: totalBalance.toString(),
+    totalWithdrawn: totalWithdrawn.toString(),
+    totalDeposited: totalDeposited.toString(),
+    circulation: circulation,
+  };
 }
-
-// treasury address (the one that creates the vesting contracts), dmc coin type
-const circulation = await getCirculation(
-  "0x8784e730078c87be9fbf9975392f4bc08e39a09a39207b50ba2fca58b5fcd2b1",
-  "0x4c981f3ff786cdb9e514da897ab8a953647dae2ace9679e8358eec1e3e8871ac::dmc::DMC"
-);
-console.log(circulation.toString());
