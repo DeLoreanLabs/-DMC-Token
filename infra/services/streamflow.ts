@@ -71,5 +71,6 @@ export async function getCirculation(
     totalWithdrawn: totalWithdrawn.toString(),
     totalDeposited: totalDeposited.toString(),
     circulation: circulation,
+    totalSupply: totalSupply.toString(),
   };
 }
