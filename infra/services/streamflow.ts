@@ -59,10 +59,6 @@ export async function getCirculation(
     totalBalance = totalBalance.add(new BN(coin.balance));
   });
 
-  console.log("Total balance:", totalBalance.toString());
-  console.log("Total withdrawn:", totalWithdrawn.toString());
-  console.log("Total deposited:", totalDeposited.toString());
-
   let totalSupply = new BN(12800000000).mul(new BN(10).pow(new BN(9)));
 
   const circulation = totalSupply
