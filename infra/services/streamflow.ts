@@ -8,8 +8,16 @@ const streamflowClient = new StreamflowSui.SuiStreamClient(
 
 const client = new SuiClient({ url: getFullnodeUrl("mainnet") });
 
+// Helper to convert BN to string with 9 decimals
+function formatBNToDecimalString(bn: BN): string {
+  const str = bn.toString().padStart(10, "0");
+  const intPart = str.slice(0, str.length - 9) || "0";
+  const decPart = str.slice(str.length - 9).padStart(9, "0");
+  return `${intPart}.${decPart}`.replace(/^0+([1-9])/, "$1"); // remove leading zeros
+}
+
 // input parameters: treasury address: string, coin type: string
-// returns: circulation: BN
+// returns: circulation: number (9 decimal precision)
 export async function getCirculation(
   treasuryAddress: string,
   coinType: string
@@ -35,6 +43,7 @@ export async function getCirculation(
 
   let totalWithdrawn = new BN(0);
   let totalDeposited = new BN(0);
+
   for (const contract of suiContracts) {
     try {
       const stream = await streamflowClient.getOne({ id: contract.address });
@@ -50,7 +59,7 @@ export async function getCirculation(
     coinType: coinType,
   });
 
-  if (coinList.data.length == 0) {
+  if (coinList.data.length === 0) {
     throw new Error("No coins found");
   }
 
@@ -59,18 +68,20 @@ export async function getCirculation(
     totalBalance = totalBalance.add(new BN(coin.balance));
   });
 
-  let totalSupply = new BN(12800000000).mul(new BN(10).pow(new BN(9)));
+  const totalSupply = new BN(12800000000).mul(new BN(10).pow(new BN(9))); // 12.8B * 10^9
 
-  const circulation = totalSupply
+  const circulationBN = totalSupply
     .sub(totalBalance)
     .sub(totalDeposited)
     .add(totalWithdrawn);
 
+  const circulation = formatBNToDecimalString(circulationBN);
+
   return {
-    totalBalance: totalBalance.toString(),
-    totalWithdrawn: totalWithdrawn.toString(),
-    totalDeposited: totalDeposited.toString(),
-    circulation: circulation,
-    totalSupply: totalSupply.toString(),
+    totalBalance: formatBNToDecimalString(totalBalance),
+    totalWithdrawn: formatBNToDecimalString(totalWithdrawn),
+    totalDeposited: formatBNToDecimalString(totalDeposited),
+    circulation, // number with 9 decimal precision
+    totalSupply: formatBNToDecimalString(totalSupply),
   };
 }
